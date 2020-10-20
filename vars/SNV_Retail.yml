@@ -191,5 +191,5 @@ tenant:
 # Metadata for the Virtualization domains used by EPGs
 domains:
   vCenter_VMM:
-    domain_type: vmm
-    vm_provider: vmware
+    domain_type: "vmm"
+    vm_provider: "vmware"

@@ -87,8 +87,8 @@
         ap: "{{ item.ap }}"
         epg: "{{ item.name }}"
         domain: "{{ item.domain }}"
-        domain_type: "{{ domains[item.domain].domain_type}} "
-        vm_provider: "{{ domains[item.domain].vm_provider}} "
+        domain_type: "{{ domains[item.domain].domain_type}} " #works only addid vmm manually
+        vm_provider: "{{ domains[item.domain].vm_provider}} " #works only ading vmware 
         state: present
       delegate_to: localhost
       loop: "{{ tenant.epgs }}"
