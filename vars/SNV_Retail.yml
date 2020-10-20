@@ -1,0 +1,195 @@
+---
+# The top-level policy container, this tenant will contain
+# all of the other objects.
+tenant:
+  name: "SNV_Retail"
+  description: "SNV_Retail Hosted Customer Services - Managed by Ansible"
+
+  # VRFs must have a name and belong to their parent tenant.
+  vrfs:
+    - name: "UserServices_VRF"
+      description: "Managed by Ansible"
+
+  # Bridge Domains must have a name, belong to their parent tenant,
+  # and are linked to a specific VRF. They may also include one or more
+  # subnet definitions.
+  bridge_domains:
+    - name: "Services_BD"
+      description: "Managed by Ansible"
+      vrf: "UserServices_VRF"
+      subnet: "10.0.1.254/24"
+
+    - name: "Services_BD"
+      description: "Managed by Ansible"
+      vrf: "UserServices_VRF"
+      subnet: "10.0.2.254/24"
+
+    - name: "Services_BD"
+      description: "Managed by Ansible"
+      vrf: "UserServices_VRF"
+      subnet: "10.0.3.254/24"
+
+    - name: "Users_BD"
+      description: "Managed by Ansible"
+      vrf: "UserServices_VRF"
+      subnet: "10.0.4.254/24"
+
+  # Application Profiles belong to their parent tenant and serve
+  # as policy containers for EPGs and their relationships.
+  apps:
+    - name: "UserServices_APP"
+      description: "Managed by Ansible"
+
+  # Endpoint Groups define Endpoint related policy (domain, BD) and allow for
+  # contract bindings to implement security policies.
+  epgs:
+    - name: "Web_EPG"
+      description: "Managed by Ansible"
+      ap: "UserServices_APP"
+      bd: "Services_BD"
+      domain: "vCenter_VMM"
+
+    - name: "Email_EPG"
+      description: "Managed by Ansible"
+      ap: "UserServices_APP"
+      bd: "Services_BD"
+      domain: "vCenter_VMM"
+
+    - name: "Storage_EPG"
+      description: "Managed by Ansible"
+      ap: "UserServices_APP"
+      bd: "Services_BD"
+      domain: "vCenter_VMM"
+
+    - name: "Users_EPG"
+      description: "Managed by Ansible"
+      ap: "UserServices_APP"
+      bd: "Users_BD"
+      domain: "vCenter_VMM"
+
+  # Filters define stateless traffic flows.
+  filters:
+    - name: "web_filter"
+      description: "Managed by Ansible"
+      entry: "http"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "80"
+      destination_to: "80"
+
+    - name: "web_filter"
+      description: "Managed by Ansible"
+      entry: "https"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "443"
+      destination_to: "443"
+
+    - name: "email_filter"
+      description: "Managed by Ansible"
+      entry: "smtp"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "25"
+      destination_to: "25"
+
+    - name: "email_filter"
+      description: "Managed by Ansible"
+      entry: "smtps"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "587"
+      destination_to: "587"
+
+    - name: "email_filter"
+      description: "Managed by Ansible"
+      entry: "imaps"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "993"
+      destination_to: "993"
+
+    - name: "storage_filter"
+      description: "Managed by Ansible"
+      entry: "pgsql"
+      ethertype: "ip"
+      ip_protocol: "tcp"
+      destination_from: "5432"
+      destination_to: "5432"
+
+
+  # Contracts define security and connectivity policies that
+  # that implement specific filters.
+  contracts:
+    - name: "WebServices_CON"
+      filter: "web_filter"
+      description: "Managed by Ansible"
+
+    - name: "WebServices_CON"
+      filter: "icmp"
+      description: "Managed by Ansible"
+
+    - name: "EmailServices_CON"
+      filter: "email_filter"
+      description: "Managed by Ansible"
+
+    - name: "EmailServices_CON"
+      filter: "icmp"
+      description: "Managed by Ansible"
+
+    - name: "StorageServices_CON"
+      filter: "storage_filter"
+      description: "Managed by Ansible"
+
+    - name: "StorageServices_CON"
+      filter: "icmp"
+      description: "Managed by Ansible"
+
+  # EPGs can be providers and/or consumers for specific contracts, opening
+  # up the traffic flow as per the filter definitions.
+  contract_bindings:
+    # Users_EPG -> Web_EPG (HTTP, HTTPS)
+    - epg: "Users_EPG"
+      ap: "UserServices_APP"
+      contract: "WebServices_CON"
+      type: "consumer"
+
+    - epg: "Web_EPG"
+      ap: "UserServices_APP"
+      contract: "WebServices_CON"
+      type: "provider"
+
+    # Users_EPG -> Email_EPG (25, 587, 993)
+    - epg: "Users_EPG"
+      ap: "UserServices_APP"
+      contract: "EmailServices_CON"
+      type: "consumer"
+
+    - epg: "Email_EPG"
+      ap: "UserServices_APP"
+      contract: "EmailServices_CON"
+      type: "provider"
+
+    # Web_EPG -> Storage_EPG (5432)
+    # Email_EPG -> Storage_EPG (5432)
+    - epg: "Web_EPG"
+      ap: "UserServices_APP"
+      contract: "StorageServices_CON"
+      type: "consumer"
+
+    - epg: "Email_EPG"
+      ap: "UserServices_APP"
+      contract: "StorageServices_CON"
+      type: "consumer"
+
+    - epg: "Storage_EPG"
+      ap: "UserServices_APP"
+      contract: "StorageServices_CON"
+      type: "provider"
+
+
+# Metadata for the Virtualization domains used by EPGs
+domains:
+  vCenter_VMM:
+    domain_type: "vmm"
+    vm_provider: "vmware"

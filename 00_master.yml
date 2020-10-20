@@ -1,0 +1,16 @@
+---
+# All playbooks imported here are designed to also execute independently.
+# Note: The workflow is linear and each playbook depends on the policy
+# objects created by the playbooks before it.
+
+##### Step 1: Create a Tenant and its VRFs and Bridge Domains.
+- name: PROVISION TENANT INFRASTRUCTURE
+  import_playbook: 01_tenant_infra.yml
+
+##### Step 2: Create Application Profiles and Endpoint Groups.
+- name: PROVISION APPLICATION PROFILES AND EPGS
+  import_playbook: 02_epgs.yml
+
+##### Step 3: Create and apply the Security Policy (Contracts).
+- name: PROVISION SECURITY POLICY
+  import_playbook: 03_contracts.yml

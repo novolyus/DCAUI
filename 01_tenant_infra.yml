@@ -1,0 +1,29 @@
+---
+
+- name: PRE-DEPLOYMENT SETUP AND VALIDATION
+  hosts: apic
+
+  tasks:
+
+    # All of these should be defined:
+    # ansible_host, ansible_port, ansible_user, ansible_password, validate_certs
+    # customer_name
+    - name: Test that connection details are defined
+      assert:
+        that:
+          - "ansible_host is defined"
+          - "ansible_port is defined"
+          - "ansible_user is defined"
+          - "ansible_password is defined"
+          - "validate_certs is defined"
+          - "customer_name is defined"
+        fail_msg: "Please ensure that these variables exist: ansible_host,
+          ansible_port, ansible_user, ansible_password, validate_certs
+          and customer_name!"
+        quiet: true
+
+    # These variables represent the data model and are used by
+    # the rest of the playbook to deploy the policy.
+    - name: Load Infrastructure Definition
+      include_vars:
+        file: "{{ customer_name }}.yml"

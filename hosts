@@ -1,0 +1,17 @@
+[all:vars]
+# This is used to load the data model that feeds into
+# all of the playbooks in this collection from the local
+# file, i.e. vars/SNV_Retail.yml
+customer_name=SNV_Retail
+
+# The ACI Controllers
+[aci]
+apic ansible_host=apic
+
+[aci:vars]
+ansible_port=443
+# Login credentials
+ansible_user=admin
+ansible_password=1234QWer
+# Set to true for production setups that use trusted certificates!
+validate_certs=false
