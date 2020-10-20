@@ -3,6 +3,7 @@
 - name: PRE-DEPLOYMENT SETUP AND VALIDATION
   hosts: apic
 
+
   tasks:
 
     # All of these should be defined:
@@ -41,6 +42,14 @@
         password: "{{ ansible_password }}"
         validate_certs: "{{ validate_certs }}"
 
+        tenant: "{{ tenant.name }}"
+        ap: "{{ item.name }}"
+        description: "{{ item.description }}"
+        state: present
+      loop: "{{ tenant.apps }}"
+
+
+
       # ADD MODULE PARAMETERS HERE!
       delegate_to: localhost
 
@@ -51,6 +60,17 @@
         user: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         validate_certs: "{{ validate_certs }}"
+
+        tenant: "{{ tenant.name }}"
+        bd: "{{ item.bd }}"
+        ap: "{{ item.ap }}"
+        epg: "{{ item.name }}"
+        description: "{{ item.description }}"
+        state: present
+      loop: "{{ tenant.epgs }}"
+
+
+
 
       # ADD MODULE PARAMETERS HERE!
       delegate_to: localhost
@@ -63,5 +83,15 @@
         password: "{{ ansible_password }}"
         validate_certs: "{{ validate_certs }}"
 
-      # ADD MODULE PARAMETERS HERE!
+        tenant: "{{ tenant.name }}"
+        ap: "{{ item.ap }}"
+        epg: "{{ item.name }}"
+        domain: "{{ item.domain }}"
+        domain_type: "{{ domains[item.domain].domain_type}} "
+        vm_provider: "{{ domains[item.domain].vm_provider}} "
+        state: present
       delegate_to: localhost
+      loop: "{{ tenant.epgs }}"
+
+      # ADD MODULE PARAMETERS HERE!
+      
