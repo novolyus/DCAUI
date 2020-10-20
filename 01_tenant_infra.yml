@@ -56,7 +56,7 @@
         description: "{{ item.description }}"
         state: present
       delegate_to: localhost
-      loop: "{{ tenants.vrfs }}" 
+      loop: "{{ tenant.vrfs }}" 
 
 
     - name: CREATE BRIDGE DOMAINS
@@ -73,5 +73,21 @@
         state: present
       delegate_to: localhost
       loop: "{{ tenant.bridge_domains }}" 
-  
+
+    - name: CREATE BRIDGE DOMAINS SUBNETS
+      aci_bd_subnet:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: "{{ validate_certs }}"
+
+        tenant: "{{ tenant.name }}"
+        bd: "{{ item.name }}"
+        gateway: "{{ item.subnet.split('/') | first }}"
+        mask: "{{ item.subnet.split('/') | last }}"
+        description: "{{ item.description }}"
+        state: present
+      delegate_to: localhost
+      loop: "{{ tenant.bridge_domains }}" 
 
