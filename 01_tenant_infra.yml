@@ -27,3 +27,51 @@
     - name: Load Infrastructure Definition
       include_vars:
         file: "{{ customer_name }}.yml"
+
+
+    - name: CREATE A TENANT
+      aci_tenant:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: "{{ validate_certs }}"
+
+        tenant: "{{ tenant.name }}"
+        description: "{{ tenant.description }}"
+        state: present
+      delegate_to: localhost 
+
+
+    - name: CREATE A VRF
+      aci_vrf:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: "{{ validate_certs }}"
+
+        tenant: "{{ tenant.name }}"
+        vrf: "{{ item.name }}"
+        description: "{{ item.description }}"
+        state: present
+      delegate_to: localhost
+      loop: "{{ tenants.vrfs }}" 
+
+
+    - name: CREATE BRIDGE DOMAINS
+      aci_bd:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: "{{ validate_certs }}"
+
+        tenant: "{{ tenant.name }}"
+        bd: "{{ item.name }}"
+        description: "{{ item.description }}"
+        state: present
+      delegate_to: localhost
+      loop: "{{ tenant.bridge_domains }}" 
+  
+
